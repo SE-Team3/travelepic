@@ -37,7 +37,7 @@ function searchPetrolBunks()
 
 	var request = {
 		location: latlng,
-		radius: '5000',
+		radius: '1000',
 		types: ["parking","library","museum","police","hindu_temple","lodging","shopping"]
 	};
 	
