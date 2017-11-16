@@ -21,7 +21,7 @@
     }
     else
     {
-        echo"<script>alert('Login unsuccessfull,please try again')</script>";
-        echo "<script>window.open('../group-login.html','_self')</script>";
+        echo"<script>alert('Login unsuccessfull,please try again ".$group_grouppid."')</script>";
+        //echo "<script>window.open('../group-login.html','_self')</script>";
     }
 ?>

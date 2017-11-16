@@ -29,7 +29,7 @@
     $result=mysqli_query($dbcon,$checksql);
     $num=mysqli_num_rows($result);
     if($num==1){
-        echo "<script>window.open('../tripindex.html','_self')</script>";
+        echo "<script>window.open('../group-login.html','_self')</script>";
     }
     else
     {
