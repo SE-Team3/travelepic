@@ -31,31 +31,54 @@ icons = {
   }
 };
 
-function searchPetrolBunks()
+markers=[]
+places=[]
+
+function getNearbyPlaces()
 {
 	var latlng = new google.maps.LatLng(pos.lat,pos.lng);
 
 	var request = {
 		location: latlng,
 		radius: '1000',
-		types: ["parking","library","museum","police","hindu_temple","lodging","shopping"]
+		types: Object.keys(icons)
 	};
 	
 	service = new google.maps.places.PlacesService(map);
-	service.nearbySearch(request, placeMarkers);
+	service.nearbySearch(request, storeMarkers);
 }
 
-function placeMarkers(results,status)
+function displayPlaces()
+{
+	display_places=[];
+	$('.btn-filter.active').each(function(){
+		display_places.push($(this).attr('id'));
+	});
+
+	clearMarkers();
+
+	for(i in display_places)
+	{
+		for(j in places)
+		{
+			if(places[j].types[0]==display_places[i])
+				createMarkers(places[j])
+		}
+	}
+
+}
+
+function storeMarkers(results,status)
 {
 	if (status == google.maps.places.PlacesServiceStatus.OK) {
 	    for (var i = 0; i < results.length; i++) {
-	      var place = results[i];
-	      console.log(results[i]);
-	      createMarkers(place);
+	      places.push(results[i]);
 	    }
 	}
 	else
-		alert(status)
+		alert(status);
+
+	displayPlaces();
 }
 
 function createMarkers(place){
@@ -70,10 +93,20 @@ function createMarkers(place){
 			break;
 		}
 	}
-	if(iList)
-	var marker = new google.maps.Marker({
-      map: map,
-	  icon: icons[place.types[0]].icon,
-      position: place.geometry.location
-    });
+	if(iList){
+		marker = new google.maps.Marker({
+	      map: map,
+		  icon: icons[place.types[0]].icon,
+	      position: place.geometry.location
+	    });
+
+	    markers.push(marker);
+	}
+}
+
+function clearMarkers()
+{
+	for(i in markers)
+		markers[i].setMap(null);
+	markers=[];
 }

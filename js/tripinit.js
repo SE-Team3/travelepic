@@ -23,7 +23,7 @@ function initMap()
             });
             map.setCenter(pos);
 
-            searchPetrolBunks();
+            displayPlaces();
 
         }, function() {
             handleLocationError(true, infoWindow, map.getCenter());

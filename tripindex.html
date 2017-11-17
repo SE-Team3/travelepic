@@ -32,14 +32,15 @@
             margin: 0;
             padding: 0;
         }
-        .custom{
-            color:#7f8c8d;
-            opacity:1.0;
+
+        .btn-filter{
+            opacity:0.6;
         }
 
-        .custom:active{
-        color:red;
+        .btn-filter.active{
+            opacity:1;
         }
+
     </style>
 
 </head>
@@ -68,31 +69,31 @@
             </button>
         </div>
         <div class="pull-left">
-            <button id="parking" data-toggle="toggle" style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/parking_lot_maps.png);" class="btn btn-default" type="submit">
+            <button id="parking" data-toggle="toggle" style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/parking_lot_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
         <div class="pull-left">
-            <button id="library" data-toggle="toggle" style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/library_maps.png);" class="btn btn-default" type="submit">
+            <button id="library" data-toggle="toggle" style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/library_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
         <div class="pull-left">
-            <button id="museum"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/museum_maps.png);" class="btn btn-default" type="submit">
+            <button id="museum"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/museum_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
         <div class="pull-left">
-            <button id="lodging"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/lodging_maps.png);" class="btn btn-default" type="submit">
+            <button id="lodging"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/lodging_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
         <div class="pull-left">
-            <button id="shopping"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/shopping_maps.png);" class="btn btn-default" type="submit">
+            <button id="shopping"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/shopping_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
         <div class="pull-left">
-            <button id="police"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/police_maps.png);" class="btn btn-default" type="submit">
+            <button id="police"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/police_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
         <div class="pull-left">
-            <button id="hindu"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/hindu_temple_maps.png);" class="btn btn-default" type="submit">
+            <button id="hindu_temple"  style="width:35px;height:34px;background-image: url(https://maps.google.com/mapfiles/kml/shapes/hindu_temple_maps.png);" class="btn btn-default btn-filter" type="submit">
             </button>
         </div>
                 </div>
@@ -101,6 +102,14 @@
         //Global position and map variables
         pos=null;
         map=null;
+
+        $(document).ready(function(){
+            $('.btn-filter').click(function(){
+                $(this).toggleClass('active');
+                getNearbyPlaces();
+            });
+        });
+
     </script>
     <script type="text/javascript" src="js/tripinit.js"></script>
     <script type="text/javascript" src="js/placeSearch.js"></script>
