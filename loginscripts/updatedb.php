@@ -10,8 +10,19 @@
 	echo $_SESSION['userid'];
 	  //echo"<script>alert('hi welcome')</script>";
 	//echo "<script>alert('$co')</script>";
-	$userloc="insert into location_details(userid, location) VALUES('".$_SESSION['userid']."','$location')";
-    mysqli_query($dbcon,$userloc);
+//changed here
+	$sql="select * from location_details where userid=".$_SESSION['userid']."";
+	$res=mysqli_query($dbcon, $sql);
+	$num=mysqli_num_rows($res);
+	if($num==1){
+		$sql2="update location_details set location='$location' where userid=".$_SESSION['userid']."";
+		mysqli_query($dbcon, $sql2);
+	}
+	else
+	{
+		$userloc="insert into location_details(userid, location) VALUES('".$_SESSION['userid']."','$location')";
+    		mysqli_query($dbcon,$userloc);
+	}
 	ob_flush();
 	flush();
 ?>

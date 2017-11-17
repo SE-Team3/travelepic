@@ -24,16 +24,21 @@
     echo $insert_group;
     
     if(mysqli_query($dbcon,$insert_group)){
-		$sql1="select * from group_admin where userid=".$_SESSION['userid']." AND groupid=".$_SESSION['groupid']."";
+	    //no session variable groupid here
+	    	$sqlgroupid="select groupid from travel_group where groupname='$group_name' AND grouppassword='$group_password'";
+	    	$res1=mysqli_query($dbcon,$sqlgroupid);
+	    	$row = mysqli_fetch_array($res1);
+	    	$grpid = $row['groupid'];
+		$sql1="select * from group_admin where userid=".$_SESSION['userid']." AND groupid='$grpid'";
 		$result1=mysqli_query($dbcon,$sql1);
 		if(mysqli_num_rows($result1)>0){
-			$sql2="update group_admin set userid=".$_SESSION['userid']."";
-			$sql3="update group_admin set groupid=".$_SESSION['groupid']."";
-			mysqli_query($dbcon,$sql2);
+			//$sql2="update group_admin set userid=".$_SESSION['userid']." where ";
+			$sql3="update group_admin set groupid='$grpid' where userid=".$_SESSION['userid']."";
+			//mysqli_query($dbcon,$sql2);
 			mysqli_query($dbcon,$sql3);
 		}
 		else {
-			$sql2="Insert into group_admin values(".$_SESSION['userid'].",".$_SESSION['groupid'].")";
+			$sql2="Insert into group_admin values(".$_SESSION['userid'].",'$grpid')";
 			mysqli_query($dbcon,$sql2);
 		}
         echo "<script>window.open('../group-login.html','_self')</script>";
