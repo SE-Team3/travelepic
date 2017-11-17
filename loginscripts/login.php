@@ -25,10 +25,12 @@
         exit();
     }
 
-    $checksql="select * from user WHERE email='$user_email' AND password='$user_password'"; 
+   $checksql="select * from user WHERE email='$user_email' AND password='$user_password'"; 
     $result=mysqli_query($dbcon,$checksql);
     $num=mysqli_num_rows($result);
+	$res=mysqli_fetch_assoc($result);
     if($num==1){
+		$_SESSION['userid']=$res['userid'];
         echo "<script>window.open('../group-login.html','_self')</script>";
     }
     else
