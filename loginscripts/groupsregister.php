@@ -32,9 +32,9 @@
 		$sql1="select * from group_admin where userid=".$_SESSION['userid']." AND groupid='$grpid'";
 		$result1=mysqli_query($dbcon,$sql1);
 		if(mysqli_num_rows($result1)>0){
-			$sql2="update group_admin set userid=".$_SESSION['userid']."";
-			$sql3="update group_admin set groupid='$grpid'";
-			mysqli_query($dbcon,$sql2);
+			//$sql2="update group_admin set userid=".$_SESSION['userid']." where ";
+			$sql3="update group_admin set groupid='$grpid' where userid=".$_SESSION['userid']."";
+			//mysqli_query($dbcon,$sql2);
 			mysqli_query($dbcon,$sql3);
 		}
 		else {
