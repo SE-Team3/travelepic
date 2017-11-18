@@ -15,6 +15,22 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript">
+        var xhr=new XMLHttpRequest();
+        xhr.open("GET","loginscripts/groupinfo.php",true);
+        xhr.onreadystatechange=function(){
+           if(this.readyState==4 && this.status==200){
+            var res=JSON.parse(this.response);
+            if(res.admin=="no")
+            {
+                $('#destination').hide()
+            }
+
+           }
+        }
+        xhr.send();
+    </script>
 
     <style type="text/css">
         #map {
@@ -51,7 +67,7 @@
     <ul>
         <li><a href="tripindex.html" class="active">Navigate</a></li>
         <li><a href="#">Chat</a></li>
-        <li><a href="#">Manage Group</a></li>
+        <li><a href="loginscripts/logout.php">Logout</a></li>
         
     </ul>
     <div class="container row" style="padding:5%">
