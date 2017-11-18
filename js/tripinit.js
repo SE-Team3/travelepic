@@ -1,39 +1,42 @@
+marker=null;
+
 function initMap()
 {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 20.5937, lng: 78.9629},
         zoom: 10
     });
-
+//alert(document.cookie);
     directionsService = new google.maps.DirectionsService;
     directionsDisplay = new google.maps.DirectionsRenderer;
-
-
+    pos=null;
+//////***********************
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             pos = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-            var marker = new google.maps.Marker({
-                icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+//**********************global marker*************************
+             marker = new google.maps.Marker({
+                icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
                 map: map,
                 animation: google.maps.Animation.DROP,
                 position: pos
             });
             map.setCenter(pos);
-
-            displayPlaces();
-
         }, function() {
             handleLocationError(true, infoWindow, map.getCenter());
         });
-    } else {
+    }
+	else {
         // Browser doesn't support Geolocation
         handleLocationError(false, infoWindow, map.getCenter());
     }
     
     directionsDisplay.setMap(map);
+	
+	//////****************************************
 
     var geocoder = new google.maps.Geocoder();
     
@@ -43,6 +46,7 @@ function initMap()
     });
     enablePlaceSearchAPI();
 }
+
 
 function enablePlaceSearchAPI()
 {
@@ -66,8 +70,8 @@ function enablePlaceSearchAPI()
       }
 
       // Clear out the old markers.
-      markers.forEach(function(marker) {
-        marker.setMap(null);
+      markers.forEach(function(markert) {
+        markert.setMap(null); //////////*********************************marker or markers????????????????
       });
       markers = [];
 
@@ -103,6 +107,48 @@ function enablePlaceSearchAPI()
       });
       map.fitBounds(bounds);
        });
+	   ////*********
+	   UpdatePosDb();
+}
+
+function UpdatePosDb()
+{
+	xhr=new XMLHttpRequest();
+	xhr.onreadystatechange=function() {
+				if (this.readyState == 4 && this.status == 200) 
+				{
+					setTimeout(UpdatePosDb, 5000);
+				}
+		};
+	if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            pos1 = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+				  };
+				
+				if(pos1){
+				pos=pos1;
+				obj=new google.maps.LatLng(pos.lat,pos.lng)
+				marker.setPosition(obj);
+				}
+			
+            map.setCenter(pos1);
+			 url = "travelepic/../loginscripts/updatedb.php?lat="+parseFloat(position.coords.latitude)+"&lon="+parseFloat(position.coords.longitude);
+			 xhr.open("GET", url, true);
+			 xhr.send();
+				  /////UPDATE MARKER *********************
+				//  marker.setMap(null);
+				 // marker.setPosition(pos1);	  
+				 
+				  //alert("hello");  
+			});
+		}
+		else {
+				handleLocationError(false, infoWindow, map.getCenter());
+			 }
+	
+	
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) 
@@ -148,7 +194,22 @@ function calculateAndDisplayRoute(directionsService,directionsDisplay,pos)
             }
         }
     );
-    //Remove old marker
-    if(marker)
-      marker.remove(null);
+	//alert(pos);
+	
+	if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            pos1 = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+				  };
+				
+	var dest=document.getElementById('destination').value;
+	xhr2=new XMLHttpRequest();
+	xhr.open("GET","travelepic/../loginscripts/updatedest.php?lat="+parseFloat(position.coords.latitude)+"&lon="+parseFloat(position.coords.longitude)+"&dest="+dest,true);
+	xhr.send(); 
+			});
+		}
+	
+    if(marker) 
+		marker.setMap(null);
 }
