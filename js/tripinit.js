@@ -121,10 +121,10 @@ function getAllUserLocation()
 			if(this.readyState==4 && this.status==200)
 			{
 				res=JSON.parse(this.response);
-				//alert(res[0].location)
 				var markers=[];
-				for(i=0; i<2; i++)
+				for(i=0; i<res.length; i++)
 				{	
+          console.log(res[i]);
 					 var st=res[i].location.split(":");
 					 //alert(st[1]);
 					var postn={

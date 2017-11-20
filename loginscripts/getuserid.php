@@ -12,7 +12,7 @@
 	if($num>1)
 	{
 		//$row = mysqli_fetch_array($res);
-		while ($row = mysqli_fetch_array($res, MYSQL_ASSOC)) 
+		while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) 
 		{
 			if($_SESSION['userid'] !== $row['userid'])//if not the requested user
 			{
@@ -24,7 +24,8 @@
 				$row2 = mysqli_fetch_array($res2);
 				$row_array['username'] = $row2['username'];
 				$row_array['location'] = $row1['location'];
-				
+				echo $sql1;
+				echo $sql2;
 				array_push($ass_array,$row_array);
 			}	
 		}	
