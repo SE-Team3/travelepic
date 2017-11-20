@@ -108,7 +108,41 @@ function enablePlaceSearchAPI()
       map.fitBounds(bounds);
        });
 	   ////*********
+	   //alert("hello");
+	   getAllUserLocation();
 	   UpdatePosDb();
+}
+
+function getAllUserLocation()
+{
+	//alert("hello");
+	xhr1=new XMLHttpRequest();
+	xhr1.onreadystatechange=function(){
+			if(this.readyState==4 && this.status==200)
+			{
+				res=JSON.parse(this.response);
+				//alert(res[0].location)
+				var markers=[];
+				for(i=0; i<2; i++)
+				{	
+					 var st=res[i].location.split(":");
+					 //alert(st[1]);
+					var postn={
+						 lat:parseFloat(st[0]),
+						 lng:parseFloat(st[1])
+						 };
+					 markers[i] = new google.maps.Marker({
+						icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+						map: map,
+						position: postn
+					});
+					map.setCenter(postn);
+				}
+				
+			}
+		}
+	xhr1.open("GET", "loginscripts/getuserid.php", true);
+	xhr1.send();
 }
 
 function UpdatePosDb()
