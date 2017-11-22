@@ -1,5 +1,7 @@
 <?php
-ob_start();
+    //Admin status of user given he's logged in a group
+
+    ob_start();
 	session_start();
 	extract($_GET);
 	//extract($_COOKIE);

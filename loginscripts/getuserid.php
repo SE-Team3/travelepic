@@ -1,8 +1,10 @@
 <?php
-//has session var userid should get user of same group
+	//Returns username & location
+
+	//has session var userid should get user of same group
 	ob_start();
 	session_start();
-	// extract($_GET);
+
 	$dbcon=mysqli_connect("localhost","root","","travelepic");
 	$ass_array=array();
 	$sql="select userid from user_group where groupid=".$_SESSION['groupid']."";
@@ -11,7 +13,6 @@
 	//if 1 = only one member else many
 	if($num>1)
 	{
-		//$row = mysqli_fetch_array($res);
 		while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) 
 		{
 			if($_SESSION['userid'] !== $row['userid'])//if not the requested user
@@ -32,6 +33,7 @@
 		
 	}
 	/*
+	JSON Structure
 	{
 		'username'=>username_for_given_userid
 		'location'=>location_of_user

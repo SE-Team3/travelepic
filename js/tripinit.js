@@ -1,70 +1,86 @@
 marker=null;
+MAX_POS_UPDATE_MARGIN=1.5
 
+//Initializes map, directions renderer and API along with predictive fetching destinations
 function initMap()
 {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 20.5937, lng: 78.9629},
-        zoom: 10
-    });
-      username="";
+  //Creates map and centers it at given coords, sets zoom at city level
+  map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 20.5937, lng: 78.9629},
+      zoom: 10
+  });
+
+  username="";
   xhruser=new XMLHttpRequest();
+
   xhruser.onreadystatechange=function(){
     if(this.readyState==4 && this.status==200)
     {
       username=this.response;
     }
   }
+
   xhruser.open("GET", "loginscripts/getusername.php", true);
   xhruser.send();
   
+  //Connects to Google's DirectionsAPI
   directionsService = new google.maps.DirectionsService;
+  //Object relating to rendering directions onto Google Maps
   directionsDisplay = new google.maps.DirectionsRenderer;
+
+  //Dont change existing initial and destination markers
   directionsDisplay.setOptions( { suppressMarkers: true } );
   
   pos=null;
+
+  //GeoLocation obtained only over https as of current web standard
   if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
-          //global user position shared across script files
-          pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-          };
-          //*************global marker**************//
-          marker = new google.maps.Marker({
-            icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            map: map,
-            animation: google.maps.Animation.DROP,
-            position: pos,
-            title: username
-          });
 
-          //Centers map to user location
-          map.setCenter(pos); 
-
-          //get Nearby locations
-          getNearbyPlaces();
-
-      }, function() {
-          handleLocationError(true, infoWindow, map.getCenter());
+    navigator.geolocation.getCurrentPosition(function(position) {
+      //global user position shared across script files
+      pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+      };
+      //*************global marker**************//
+      marker = new google.maps.Marker({
+        icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        map: map,
+        animation: google.maps.Animation.DROP,
+        position: pos,
+        title: username
       });
+
+      //Centers map to user location
+      map.setCenter(pos); 
+
+      //get Nearby locations
+      getNearbyPlaces();
+
+    }, function() {
+      handleLocationError(true, infoWindow, map.getCenter());
+    });
   }
   else {
         // Browser doesn't support Geolocation
         handleLocationError(false, infoWindow, map.getCenter());
     }
     
-    //Bind directions API to google maps
+    //Bind direction rendering API to google maps
     directionsDisplay.setMap(map);
 
     var geocoder = new google.maps.Geocoder();
     
+    //Fetch coordinates of destination & display route
     $('#submit').click(function(){
       locationAddress(geocoder, map);
       calculateAndDisplayRoute(directionsService, directionsDisplay,pos);
     });
 
+    //Check destination update by group admin
     setTimeout(getDestination, 1000);
 
+    //Dynamically predictively fetch most probable places as admin enters destination
     enablePlaceSearchAPI();
 }
 
@@ -72,10 +88,12 @@ function initMap()
 function enablePlaceSearchAPI()
 {
     var input = document.getElementById('destination');
+ 
     var searchBox = new google.maps.places.SearchBox(input);
+
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-    // Bias the SearchBox results towards current map's viewport.
+    // Bias the SearchBox results towards current map's viewport
     map.addListener('bounds_changed', function() {
       searchBox.setBounds(map.getBounds());
     });
@@ -90,19 +108,23 @@ function enablePlaceSearchAPI()
         return;
       }
 
-      // Clear out the old markers.
+      // Clear out the old markers, if any
       markers.forEach(function(markert) {
-        markert.setMap(null); //////////*********************************marker or markers????????????????
+        markers.setMap(null);
       });
+
       markers = [];
 
       // For each place, get the icon, name and location.
+      // Create bonds to reduce place search radius
       var bounds = new google.maps.LatLngBounds();
+
       places.forEach(function(place) {
         if (!place.geometry) {
           // console.log("Returned place contains no geometry");
           return;
         }
+
         var icon = {
           url: place.icon,
           size: new google.maps.Size(71, 71),
@@ -119,6 +141,7 @@ function enablePlaceSearchAPI()
           position: place.geometry.location
         }));
 
+        //Change bounds so that places nearby to the fetched places are also included
         if (place.geometry.viewport) {
           // Only geocodes have viewport.
           bounds.union(place.geometry.viewport);
@@ -127,17 +150,17 @@ function enablePlaceSearchAPI()
         }
       });
       map.fitBounds(bounds);
-       });
-	   ////*********
-	   //alert("hello");
-	   getAllUserLocation();
-	   UpdatePosDb();
+    });
+
+	  getAllUserLocation();
+	  UpdatePosDb();
 }
 
+//Marks other users of the group with blue markers
 function getAllUserLocation()
 {
-	//alert("hello");
 	xhr1=new XMLHttpRequest();
+
 	xhr1.onreadystatechange=function(){
 			if(this.readyState==4 && this.status==200)
 			{
@@ -145,9 +168,7 @@ function getAllUserLocation()
 				var markers=[];
 				for(i=0; i<res.length; i++)
 				{	
-          // console.log(res[i]);
 					 var st=res[i].location.split(":");
-					 //alert(st[1]);
 					var postn={
 						 lat:parseFloat(st[0]),
 						 lng:parseFloat(st[1])
@@ -167,6 +188,8 @@ function getAllUserLocation()
 	xhr1.send();
 }
 
+
+//Sync user's current location with the backend Database
 function UpdatePosDb()
 {
 	if (navigator.geolocation) {
@@ -180,7 +203,7 @@ function UpdatePosDb()
         //Update nearby places only if user location is changed beyond 1.5km
         $.getScript('js/utils.js', function()
         {
-          if(getDistanceFromLatLonInKm(pos,pos1)>1.5)
+          if(getDistanceFromLatLonInKm(pos,pos1)>MAX_POS_UPDATE_MARGIN)
             getNearbyPlaces();
         });
 
@@ -207,11 +230,11 @@ function UpdatePosDb()
   	});
 	}
 	else {
-    //Dont send xhr request and handle error gracefully
 		handleLocationError(false, infoWindow, map.getCenter());
 	}
 }
 
+//Updates destination for non-admin users
 function getDestination(){
   var xhr1=new XMLHttpRequest();
   xhr1.onreadystatechange=function()
@@ -222,6 +245,7 @@ function getDestination(){
         dest1=this.responseText;
         dest=$('#destination').val();
 
+        //Update destination and recalculate directions if its changed
         if(dest1!=dest)
         {
           $('#destination').val(dest1);
@@ -245,6 +269,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos)
     infoWindow.open(map);
 }
 
+//Encodes place address to coordinates (lat,lng)
 function locationAddress(geocoder, resultsMap) {
     var address = document.getElementById('destination').value;
     
@@ -264,6 +289,8 @@ function locationAddress(geocoder, resultsMap) {
     });
 }
 
+//API Request to directionsAPI to calculate path and render on map
+//Only group admin is allowed
 function calculateAndDisplayRoute(directionsService,directionsDisplay,pos)
 {
   directionsService.route({
@@ -280,8 +307,6 @@ function calculateAndDisplayRoute(directionsService,directionsDisplay,pos)
       }
   );
 
-	//alert(pos);
-	
 	if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
           pos1 = {

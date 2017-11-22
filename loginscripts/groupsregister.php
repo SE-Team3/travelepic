@@ -5,8 +5,7 @@
     session_start();
     $group_name=$_POST['name'];
     $group_password=$_POST['password'];
-    $regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
-
+    
     if($group_name=='')
     {
         echo"<script>alert('Please enter the group name')</script>";
