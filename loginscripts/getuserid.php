@@ -2,7 +2,7 @@
 //has session var userid should get user of same group
 	ob_start();
 	session_start();
-//	extract($_GET);
+	// extract($_GET);
 	$dbcon=mysqli_connect("localhost","root","","travelepic");
 	$ass_array=array();
 	$sql="select userid from user_group where groupid=".$_SESSION['groupid']."";
@@ -24,8 +24,6 @@
 				$row2 = mysqli_fetch_array($res2);
 				$row_array['username'] = $row2['username'];
 				$row_array['location'] = $row1['location'];
-				echo $sql1;
-				echo $sql2;
 				array_push($ass_array,$row_array);
 			}	
 		}	
@@ -33,6 +31,12 @@
 	else{
 		
 	}
+	/*
+	{
+		'username'=>username_for_given_userid
+		'location'=>location_of_user
+	}
+	*/
 	echo json_encode($ass_array);
 	ob_flush();
 	flush();

@@ -21,14 +21,13 @@
     }
 
     $insert_group="insert into travel_group(groupname,grouppassword) VALUES ('$group_name','$group_password')";
-    echo $insert_group;
     
     if(mysqli_query($dbcon,$insert_group)){
-	    //no session variable groupid here
-	    	$sqlgroupid="select groupid from travel_group where groupname='$group_name' AND grouppassword='$group_password'";
-	    	$res1=mysqli_query($dbcon,$sqlgroupid);
-	    	$row = mysqli_fetch_array($res1);
-	    	$grpid = $row['groupid'];
+	    //no session variable groupid here so write query to get it
+    	$sqlgroupid="select groupid from travel_group where groupname='$group_name' AND grouppassword='$group_password'";
+    	$res1=mysqli_query($dbcon,$sqlgroupid);
+    	$row = mysqli_fetch_array($res1);
+    	$grpid = $row['groupid'];
 		$sql1="select * from group_admin where userid=".$_SESSION['userid']." AND groupid='$grpid'";
 		$result1=mysqli_query($dbcon,$sql1);
 		if(mysqli_num_rows($result1)>0){

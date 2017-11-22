@@ -17,19 +17,23 @@
     <script src="js/bootstrap.min.js"></script>
     
     <script type="text/javascript">
-        var xhr=new XMLHttpRequest();
-        xhr.open("GET","loginscripts/groupinfo.php",true);
-        xhr.onreadystatechange=function(){
-           if(this.readyState==4 && this.status==200){
-            var res=JSON.parse(this.response);
-            if(res.admin=="no")
-            {
-                $('#destination').hide()
-            }
+        
+       $(document).ready(function(){
+            var xhr=new XMLHttpRequest();
+            xhr.open("GET","loginscripts/groupinfo.php",true);
+            xhr.onreadystatechange=function(){
+               if(this.readyState==4 && this.status==200){
+                var res=JSON.parse(this.response);
+                if(res.admin=="no")
+                {
+                    $('#destination').hide();
+                    $('#submit').hide();
+                }
 
-           }
-        }
-        xhr.send();
+               }
+            }
+            xhr.send();
+        });
     </script>
 
     <style type="text/css">
@@ -66,7 +70,7 @@
 
     <ul>
         <li><a href="tripindex.html" class="active">Navigate</a></li>
-        <li><a href="#">Chat</a></li>
+        <li><a id="chat">Chat</a></li>
         <li><a href="loginscripts/logout.php">Logout</a></li>
         
     </ul>
@@ -118,19 +122,24 @@
         //Global position and map variables
         pos=null;
         map=null;
-
-        $(document).ready(function(){
-            $('.btn-filter').click(function(){
-                $(this).toggleClass('active');
-                getNearbyPlaces();
-            });
-        });
-
     </script>
     <script type="text/javascript" src="js/tripinit.js"></script>
     <script type="text/javascript" src="js/placeSearch.js"></script>
 
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgECBocCegWYWfrtSYVu5SWDu6ubl484w&callback=initMap&libraries=places&language=en&region=IN" async defer></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.btn-filter').click(function(){
+                $(this).toggleClass('active');
+                displayPlaces();
+            });
+            loc=window.location.pathname;
+            $('#chat').attr("href","http:\/\/"+window.location.hostname+loc.substring(0, loc.lastIndexOf('/'))+"/chat/index.html");
+        });
+
+
+    </script>
 
 </body>
 </html>

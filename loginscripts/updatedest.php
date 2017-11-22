@@ -9,7 +9,7 @@
 	$result=mysqli_query($dbcon,$sql);
 	//echo $mysqli_num_rows($result);
 	if(mysqli_num_rows($result)>0){
-		$sql1="Update travel_details set location=".$lat.":".$lon." where destinationname=".$dest." AND groupid=".$_SESSION['groupid'];
+		$sql1="Update travel_details set location='".$lat.":".$lon."', destinationname='".$dest."' where groupid=".$_SESSION['groupid'];
 		$result1=mysqli_query($dbcon,$sql1);
 	}
 	else {

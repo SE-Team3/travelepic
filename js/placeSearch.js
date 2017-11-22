@@ -40,10 +40,11 @@ function getNearbyPlaces()
 
 	var request = {
 		location: latlng,
-		radius: '1000',
+		radius: '2000',
 		types: Object.keys(icons)
 	};
 	
+	// console.log('sending new requests');
 	service = new google.maps.places.PlacesService(map);
 	service.nearbySearch(request, storeMarkers);
 }
@@ -94,13 +95,13 @@ function createMarkers(place){
 		}
 	}
 	if(iList){
-		marker = new google.maps.Marker({
+		marker1 = new google.maps.Marker({
 	      map: map,
 		  icon: icons[place.types[0]].icon,
 	      position: place.geometry.location
 	    });
 
-	    markers.push(marker);
+	    markers.push(marker1);
 	}
 }
 

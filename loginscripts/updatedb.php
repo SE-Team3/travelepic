@@ -7,10 +7,10 @@
     mysqli_select_db($dbcon,"travelepic");
 	$location=$lat.":".$lon;
 	//$co=$_COOKIE['$cookie_name'];
-	echo $_SESSION['userid'];
+	// echo $_SESSION['userid'];
 	  //echo"<script>alert('hi welcome')</script>";
 	//echo "<script>alert('$co')</script>";
-//changed here
+	//changed here
 	$sql="select * from location_details where userid=".$_SESSION['userid']."";
 	$res=mysqli_query($dbcon, $sql);
 	$num=mysqli_num_rows($res);

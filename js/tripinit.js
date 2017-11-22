@@ -6,44 +6,65 @@ function initMap()
         center: {lat: 20.5937, lng: 78.9629},
         zoom: 10
     });
-//alert(document.cookie);
-    directionsService = new google.maps.DirectionsService;
-    directionsDisplay = new google.maps.DirectionsRenderer;
-    pos=null;
-//////***********************
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-//**********************global marker*************************
-             marker = new google.maps.Marker({
-                icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-                map: map,
-                animation: google.maps.Animation.DROP,
-                position: pos
-            });
-            map.setCenter(pos);
-        }, function() {
-            handleLocationError(true, infoWindow, map.getCenter());
-        });
+      username="";
+  xhruser=new XMLHttpRequest();
+  xhruser.onreadystatechange=function(){
+    if(this.readyState==4 && this.status==200)
+    {
+      username=this.response;
     }
-	else {
+  }
+  xhruser.open("GET", "loginscripts/getusername.php", true);
+  xhruser.send();
+  
+  directionsService = new google.maps.DirectionsService;
+  directionsDisplay = new google.maps.DirectionsRenderer;
+  directionsDisplay.setOptions( { suppressMarkers: true } );
+  
+  pos=null;
+  if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+          //global user position shared across script files
+          pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+          };
+          //*************global marker**************//
+          marker = new google.maps.Marker({
+            icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            map: map,
+            animation: google.maps.Animation.DROP,
+            position: pos,
+            title: username
+          });
+
+          //Centers map to user location
+          map.setCenter(pos); 
+
+          //get Nearby locations
+          getNearbyPlaces();
+
+      }, function() {
+          handleLocationError(true, infoWindow, map.getCenter());
+      });
+  }
+  else {
         // Browser doesn't support Geolocation
         handleLocationError(false, infoWindow, map.getCenter());
     }
     
+    //Bind directions API to google maps
     directionsDisplay.setMap(map);
-	
-	//////****************************************
 
     var geocoder = new google.maps.Geocoder();
     
-    document.getElementById('submit').addEventListener('click', function() {
-        locationAddress(geocoder, map);
-        calculateAndDisplayRoute(directionsService, directionsDisplay,pos);
+    $('#submit').click(function(){
+      locationAddress(geocoder, map);
+      calculateAndDisplayRoute(directionsService, directionsDisplay,pos);
     });
+
+    setTimeout(getDestination, 1000);
+
     enablePlaceSearchAPI();
 }
 
@@ -79,7 +100,7 @@ function enablePlaceSearchAPI()
       var bounds = new google.maps.LatLngBounds();
       places.forEach(function(place) {
         if (!place.geometry) {
-          console.log("Returned place contains no geometry");
+          // console.log("Returned place contains no geometry");
           return;
         }
         var icon = {
@@ -124,17 +145,18 @@ function getAllUserLocation()
 				var markers=[];
 				for(i=0; i<res.length; i++)
 				{	
-          console.log(res[i]);
+          // console.log(res[i]);
 					 var st=res[i].location.split(":");
 					 //alert(st[1]);
 					var postn={
 						 lat:parseFloat(st[0]),
 						 lng:parseFloat(st[1])
 						 };
-					 markers[i] = new google.maps.Marker({
+					markers[i] = new google.maps.Marker({
 						icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
 						map: map,
-						position: postn
+						position: postn,
+            title: res[i].username
 					});
 					map.setCenter(postn);
 				}
@@ -147,42 +169,71 @@ function getAllUserLocation()
 
 function UpdatePosDb()
 {
-	xhr=new XMLHttpRequest();
-	xhr.onreadystatechange=function() {
-				if (this.readyState == 4 && this.status == 200) 
-				{
-					setTimeout(UpdatePosDb, 5000);
-				}
-		};
 	if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            pos1 = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-				  };
+    navigator.geolocation.getCurrentPosition(function(position) {
+      pos1 = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+		  };
 				
-				if(pos1){
-				pos=pos1;
-				obj=new google.maps.LatLng(pos.lat,pos.lng)
-				marker.setPosition(obj);
-				}
-			
-            map.setCenter(pos1);
-			 url = "travelepic/../loginscripts/updatedb.php?lat="+parseFloat(position.coords.latitude)+"&lon="+parseFloat(position.coords.longitude);
-			 xhr.open("GET", url, true);
-			 xhr.send();
-				  /////UPDATE MARKER *********************
-				//  marker.setMap(null);
-				 // marker.setPosition(pos1);	  
-				 
-				  //alert("hello");  
-			});
-		}
-		else {
-				handleLocationError(false, infoWindow, map.getCenter());
-			 }
-	
-	
+  		if(pos1){
+        //Update nearby places only if user location is changed beyond 1.5km
+        $.getScript('js/utils.js', function()
+        {
+          if(getDistanceFromLatLonInKm(pos,pos1)>1.5)
+            getNearbyPlaces();
+        });
+
+  			pos=pos1;
+  			obj=new google.maps.LatLng(pos.lat,pos.lng)
+        if(marker)
+  			 marker.setPosition(obj);
+  		}
+  			
+      map.setCenter(pos1);
+  		url = "travelepic/../loginscripts/updatedb.php?lat="+parseFloat(position.coords.latitude)+"&lon="+parseFloat(position.coords.longitude);
+
+      xhr=new XMLHttpRequest();
+      xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) 
+            {
+              setTimeout(UpdatePosDb, 5000);
+            }
+      };
+
+  		xhr.open("GET", url, true);
+  		xhr.send();
+
+  	});
+	}
+	else {
+    //Dont send xhr request and handle error gracefully
+		handleLocationError(false, infoWindow, map.getCenter());
+	}
+}
+
+function getDestination(){
+  var xhr1=new XMLHttpRequest();
+  xhr1.onreadystatechange=function()
+  {
+    if(this.readyState==4 && this.status==200)
+    {
+      if(this.responseText !== "Error Retrieving destination"){
+        dest1=this.responseText;
+        dest=$('#destination').val();
+
+        if(dest1!=dest)
+        {
+          $('#destination').val(dest1);
+          $('#submit').click();
+        }
+      } 
+      setTimeout(getDestination, 5000);
+    }
+  };
+
+  xhr1.open('GET','loginscripts/getdest.php',true);
+  xhr1.send();
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) 
@@ -215,35 +266,34 @@ function locationAddress(geocoder, resultsMap) {
 
 function calculateAndDisplayRoute(directionsService,directionsDisplay,pos)
 {
-    directionsService.route({
-            origin: pos,
-            destination: document.getElementById('destination').value,
-            travelMode: 'DRIVING'
-        }, 
-        function(response, status) {
-            if (status === 'OK') {
-                directionsDisplay.setDirections(response);
-            } else {
-                window.alert('Directions request failed due to ' + status);
-            }
-        }
-    );
+  directionsService.route({
+          origin: pos,
+          destination: document.getElementById('destination').value,
+          travelMode: 'DRIVING'
+      }, 
+      function(response, status) {
+          if (status === 'OK') {
+              directionsDisplay.setDirections(response);
+          } else {
+              window.alert('Directions request failed due to ' + status);
+          }
+      }
+  );
+
 	//alert(pos);
 	
 	if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            pos1 = {
+          pos1 = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
 				  };
-				
-	var dest=document.getElementById('destination').value;
-	xhr2=new XMLHttpRequest();
-	xhr.open("GET","travelepic/../loginscripts/updatedest.php?lat="+parseFloat(position.coords.latitude)+"&lon="+parseFloat(position.coords.longitude)+"&dest="+dest,true);
-	xhr.send(); 
-			});
-		}
+        				
+        	var dest=document.getElementById('destination').value;
+        	xhr2=new XMLHttpRequest();
+        	xhr2.open("GET","travelepic/../loginscripts/updatedest.php?lat="+parseFloat(position.coords.latitude)+"&lon="+parseFloat(position.coords.longitude)+"&dest="+dest,true);
+        	xhr2.send(); 
+      	});
+	}
 	
-    if(marker) 
-		marker.setMap(null);
 }
