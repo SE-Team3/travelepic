@@ -1,5 +1,6 @@
 marker=null;
 MAX_POS_UPDATE_MARGIN=1.5
+dest_timeout=null
 
 //Initializes map, directions renderer and API along with predictive fetching destinations
 function initMap()
@@ -78,7 +79,7 @@ function initMap()
     });
 
     //Check destination update by group admin
-    setTimeout(getDestination, 1000);
+    dest_timeout=setTimeout(getDestination, 1000);
 
     //Dynamically predictively fetch most probable places as admin enters destination
     enablePlaceSearchAPI();
@@ -102,6 +103,9 @@ function enablePlaceSearchAPI()
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     searchBox.addListener('places_changed', function() {
+      if(dest_timeout)
+        clearTimeout(dest_timeout);
+
       var places = searchBox.getPlaces();
 
       if (places.length == 0) {
@@ -110,7 +114,7 @@ function enablePlaceSearchAPI()
 
       // Clear out the old markers, if any
       markers.forEach(function(markert) {
-        markers.setMap(null);
+        markert.setMap(null);
       });
 
       markers = [];
@@ -252,7 +256,7 @@ function getDestination(){
           $('#submit').click();
         }
       } 
-      setTimeout(getDestination, 5000);
+      dest_timeout=setTimeout(getDestination, 5000);
     }
   };
 
